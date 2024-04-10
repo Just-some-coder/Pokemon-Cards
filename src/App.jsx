@@ -1,18 +1,29 @@
 import {useEffect, useState} from 'react'
 import './App.css'
 
+const colours = {
+    normal: '#A8A77A',
+    fire: '#EE8130',
+    water: '#6390F0',
+    electric: '#F7D02C',
+    grass: '#7AC74C',
+    ice: '#96D9D6',
+    fighting: '#C22E28',
+    poison: '#A33EA1',
+    ground: '#E2BF65',
+    flying: '#A98FF3',
+    psychic: '#F95587',
+    bug: '#A6B91A',
+    rock: '#B6A136',
+    ghost: '#735797',
+    dragon: '#6F35FC',
+    dark: '#705746',
+    steel: '#B7B7CE',
+    fairy: '#D685AD',
+};
+
+
 function Card({pokemonID}){
-
-    const api = "https://pokeapi.co/api/v2/pokemon/";
-
-    const [Api, setApi] = useState(api + 1);
-
-    useEffect(()=>{
-        setApi(api+pokemonID);
-    },[pokemonID]);
-
-    const [cardFlip, setCardFlip] = useState(false);
-
     const [pokeData, setPokeData] = useState({
         name: "",
         types: [{type: {name: ""}}],
@@ -34,6 +45,25 @@ function Card({pokemonID}){
         height: "",
         weight: ""
     })
+
+    const [colorEffect, setColorEffect] = useState({
+        border:`solid 3px ${colours[pokeData.types[0].type.name]}`,
+        "box-shadow": `0px 5px 10px ${colours[pokeData.types[0].type.name]}`
+    });
+
+    const api = "https://pokeapi.co/api/v2/pokemon/";
+
+    const [Api, setApi] = useState(api + 1);
+
+    useEffect(()=>{
+        setApi(api+pokemonID);
+        setColorEffect({
+            border:`solid 3px ${colours[pokeData.types[0].type.name]}`,
+            "box-shadow": `0px 5px 10px ${colours[pokeData.types[0].type.name]}`
+        })
+    },[pokemonID,pokeData.types]);
+
+    const [cardFlip, setCardFlip] = useState(false);
 
     const handleCardFlip = () =>{
         setCardFlip(!cardFlip);
@@ -58,7 +88,7 @@ function Card({pokemonID}){
         );
     }else {
         return (
-            <div className={`pokemon-card`} onClick={()=>{handleCardFlip()}}>
+            <div className={`pokemon-card`} style={colorEffect} onClick={()=>{handleCardFlip()}}>
                 <div className={"pokemon-id"}>#{pokeData.id<100?0:''}{pokeData.id<10?0:''}{pokeData.id}</div>
 
                 <div className={"image-bg"}>
@@ -99,16 +129,19 @@ function App() {
     const handleChange = (event) => {
         setPokeID(event.target.value)
     }
-    const handleApi = () => {
-        setPokemonID((pokeID));
+    const handleApi = (event) => {
+        event.preventDefault()
+        setPokemonID(pokeID);
     }
 
 
     return (
         <>
+            <form onSubmit={handleApi}>
             <label>PokeDex Number <input id="search-input" value={pokeID} onChange={handleChange}/>
             </label>
             <button id={"search-button"} onClick={handleApi}>Give</button>
+            </form>
 
             <div className={"cards"}>
                 <Card pokemonID={pokemonID}/>
